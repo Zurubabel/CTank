@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<canvas id="canvasPrincipal" width="600" height="400"></canvas>
+		<script type="text/javascript" src="Tanque.js"></script>
+		<script type="text/javascript" src="Botoes.js"></script>
+		<script type="text/javascript" src="Projetil.js"></script>
+	</body>
+	
+	<script>
+		
+		var canvas = document.getElementById("canvasPrincipal");
+		var context = canvas.getContext("2d");
+		
+		// Gerenciador de botões
+		var botoes = new Botoes();
+		window.addEventListener("keydown", function(e) {botoes.botaoPressionado(e);}, true);
+		window.addEventListener("keyup", function(e) {botoes.botaoSolto(e);}, true);
+		
+		window.requestAnimFrame = (function(callback){
+			return window.requestAnimationFrame 
+			|| window.webkitRequestAnimationFrame
+			|| window.mozRequestAnimationFrame
+			|| window.oRequestAnimationFrame
+			|| window.msRequestAnimationFrame
+			|| function (callback) {
+				window.setTimeout(callback, 1000 / 60);
+			};
+		})();
+		
+		var tanque = new Tanque();
+		var projeteisCriados = [];
+		
+		// Animação
+		var mov = 0;
+		function animar(canvas, context, tempoInicial, tempoAnterior) {
+			// Update dos dados
+			var tempoAtual = (new Date()).getTime();
+			var diferencaTempo = tempoAtual - tempoAnterior;
+			
+			// Limpar
+			context.clearRect(0,0, canvas.width, canvas.height);
+			// Redesenhar
+			tanque.desenhar(diferencaTempo);
+			for (let i = 0; i < projeteisCriados.length; i++) {
+				projeteisCriados[i].animar(diferencaTempo);
+				if (projeteisCriados[i].concluiuTrajetoria()) {
+					projeteisCriados.splice(i,1);
+				}
+				console.log(projeteisCriados.length);
+			}
+			// Requisita um novo frame
+			requestAnimFrame(function() {
+				animar(canvas, context, tempoAtual, tempoInicial);
+			});
+		}
+		
+		// Parâmetros - Canvas, context, tempoInicial, tempoAnterior
+		var tempoInicial = (new Date()).getTime();
+		animar(canvas, context, tempoInicial, tempoInicial);
+		
+		
+	</script>
+	
+</html>
